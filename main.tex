@@ -1,0 +1,49 @@
+\RequirePackage[l2tabu,orthodox]{nag}
+
+% TODO: decide if one-sided/two-sided
+%\documentclass[headsepline,footsepline,footinclude=false,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc,BCOR=12mm,DIV=12]{scrbook} % two-sided
+\documentclass[headsepline,footsepline,footinclude=false,oneside,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc]{scrbook} % one-sided
+
+% TODO: change citation style in settings
+\input{settings}
+
+\newcommand*{\getUniversity}{Technische Universität München}
+\newcommand*{\getFaculty}{Department of Informatics} %TODO Check
+\newcommand*{\getTitle}{Transferring Hardware-related Information in sys-sage Across Processes and HPC Nodes}
+\newcommand*{\getTitleGer}{Übertragung von Hardware-Informationen in sys-sage Bibliothek Zwischen Prozessen und HPC Knoten}
+\newcommand*{\getAuthor}{Finn Romaneessen}
+\newcommand*{\getDoctype}{Bachelor's Thesis in Informatics}
+\newcommand*{\getSupervisor}{Prof. Dr. Martin Schulz}
+\newcommand*{\getAdvisor}{Stepan Vanecek}
+\newcommand*{\getSubmissionDate}{May 15th, 2024}
+\newcommand*{\getSubmissionLocation}{Munich}
+
+\begin{document}
+
+\pagenumbering{alph}
+\input{pages/cover}
+
+\frontmatter{}
+
+\input{pages/title}
+\input{pages/disclaimer}
+\input{pages/acknowledgments}
+\input{pages/abstract}
+\microtypesetup{protrusion=false}
+\tableofcontents{}
+\microtypesetup{protrusion=true}
+
+\mainmatter{}
+
+\input{chapters/01_introduction}
+\input{chapters/02_related_work}
+
+\appendix{}
+
+\microtypesetup{protrusion=false}
+\listoffigures{}
+\listoftables{}
+\microtypesetup{protrusion=true}
+\printbibliography{}
+
+\end{document}

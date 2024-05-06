@@ -1,3 +1,5 @@
+%TODO Use lstinline instead of emph for code?
+
 \chapter{Implementation}\label{chapter:Implementation}
 
 The part of the sys-sage library implemented in this thesis enables users to share component subtrees or whole topologies between processes of a compute node by using shared memory regions.
@@ -72,11 +74,15 @@ for users to share topologies without much inter-process comunication needed.
 \section{Components}
 Topologies consist mainly of \emph{components}, which are organized as a hierarchical tree structure.
 Each component represents a certain part of the hardware such as a CPU or cache.
+Depending on the type of hardware the component represents, there are different subclasses of Components that can store specific hardware information such as the size of a cache.
+Although there is no formal requirement, the top of the component tree is usually represented by a component of class \emph{Topology}, a subclass of \emph{Component},
+which stores no additional values.
+\autoref{lst:component_class} shows part of the sys-sage component class implementation.
 
 \begin{lstlisting}[language=c++, numbers=left, caption=Component Class, captionpos=b, label={lst:component_class}]
     class Component {
       public:
-        map<string,void*> attrib;
+        map<string, void*> attrib;
 
       protected:
         int id;
@@ -89,3 +95,78 @@ Each component represents a certain part of the hardware such as a CPU or cache.
         vector<DataPath*> dp_outgoing;
     };
 \end{lstlisting}
+
+As shown in \autoref{lst:component_class}, the component tree structure is created by the vector of component pointers in line 10 for the children, as well as a component pointer
+for the parent.
+Apart from that, the \emph{componentType} variable indicates, which component subclass and therefore which type of hardware is represented by the component.
+\emph{Id} and \emph{name} store additional information to identify the component and underlying hardware.
+
+The \emph{attrib map} enables users to attach arbitrary data to a component by associating it with a key string. This allows for a high degree of customization,
+as the user can attach any data and update it dynamically as needed.
+
+The vectors \emph{dp\_incoming} and \emph{dp\_outgoing} in lines 12 and 13 are used to store pointers to DataPaths associated with the component.
+
+\subsection{Exporting Components}\label{subsection:export_components}
+To export the topology into the shared memory region, the component tree structure including all \emph{attribs} and DataPaths needs to be transformed into one contiguous memory block.
+
+Copying the component tree into the shared memory region is performed as follows:
+\begin{enumerate}
+    \item Determining the size of the component based on its \emph{componentType}.
+    \item Copying the \emph{Component} object into the shared region using \emph{memcpy()} and the size determined previously.
+    \item Copying the \emph{attrib} map.
+    \item Copying the \emph{children} vector.
+    \item Recursively copying the children.
+\end{enumerate}
+
+\begin{figure}[!ht] %TODO Fix position
+    \includegraphics[scale=0.15]{images/component_memory.jpg} %TODO Replace graphic
+    \centering
+    \caption{Component Tree in Shared Memory}
+    \label{figure:component_memory}
+\end{figure}
+
+\autoref{figure:component_memory} illustrates how the component tree is transformed into a single contiguous memory segment.
+The \emph{Component} object is copied first, followed by its \emph{attribs} and the data segment of the \emph{children} vector.
+It is important to note that the component pointers of the \emph{children} vector need to be replaced with the respective offsets of the children in the shared memory region,
+as the virtual memory addresses will be different in each process.
+
+To achieve this, the children are recursively exported and their offsets written to the \emph{children} vectors data array.
+
+\subsection{Copying Vectors}
+Since vectors use a pointer to the contiguous heap memory location storing the underlying data, simply copying the vector object into the shared memory region will not work,
+as the virtual memory address of the data will be different in other processes. [FIND QUOTE] %TODO
+
+To circumvent this issue, the components \emph{children} vector needs to be replaced with an offset based equivalent before being copied.
+This is done by overwriting the vector object with a \emph{CopyVector} object as shown in \autoref{lst:copyvector}.
+
+\begin{lstlisting}[language=c++, numbers=left, caption=Component Class, captionpos=b, label={lst:copyvector}]
+    struct CopyVector {
+        size_t offset;
+        size_t size;
+    };
+\end{lstlisting}
+
+The \emph{CopyVector} struct consists of an \emph{offset} and a \emph{size} variable that are used to reference the underlying data of the original vector.
+\emph{Offset} stores the offset of the vector's data relative to the start of the shared memory region, while \emph{size} stores the number of elements in the vector.
+
+While recreating the component in the importing process, the \emph{CopyVector} can simply be replaced by a regular vector again, using the copied data by resolving the offset and size.
+
+\subsection{Importing Components}
+Since the component tree is transformed into a single contiguous memory block, simply using \emph{memcpy()} to import the topology into the processes private memory will not work.
+
+Importing the component tree into the receiving processes memory is done as follows:
+
+\begin{enumerate}
+    \item Reading the \emph{Components} \emph{componentType} to determine its type.
+    \item Recreating the \emph{Component} using the copy constructor of the correct component subclass.
+    \item Recreating the \emph{attrib} map by inserting all copied key-value pairs.
+    \item Recursively copying the children and recreating the \emph{children} vector.
+\end{enumerate}
+
+To recreate the \emph{children} vector, the offsets of the children stored in the \emph{CopyVector}, as described in \autoref{subsection:export_components},
+need to replaced with pointers to their respective memory addresses in the importing process.
+
+\section{Attribs}
+Components and DataPaths have an \emph{attrib} map that stores key-value pairs that can be used to add arbitrary data of any size.
+It is implementated as a \lstinline{std::map<std::string, void*>}, mapping strings to 
+\section{DataPaths}

@@ -174,7 +174,7 @@ It is implemented as a \lstinline{std::map<std::string, void*>}, mapping strings
 This allows for a high degree of customization as there are no restrictions to the size or type of data. A string can just as easily be stored as a complex user-defined class.
 However, the highly versatile use of the \emph{attrib} map also makes it difficult to copy the attrib map, since the size of the data is not necessarily known in advance.
 
-\subsection{Packing and Exporting Attribs}
+\subsection{Packing and Exporting Attribs}\label{subsection:packing_and_exporting}
 User-defined attributes can have any size and are not necessarily stored contiguously, which makes copying them into the shared memory region difficult.
 
 A simple example for this problem is an \emph{attrib} storing a linked list. Each item in the list is stored in a different memory location,
@@ -250,5 +250,29 @@ The \lstinline|num_attribs| value indicates the number of attribs exported from 
     \caption{Attribs in Shared Memory}
     \label{figure:attrib_memory}
 \end{figure}
+
+\subsection{Unpacking and Importing Attribs}
+To import the components attribs, the original attrib map needs to be recreated in the receiving process. This is done as follows:
+
+\begin{enumerate}
+    \item Reading the number of attribs from the top of the components attrib memory region as illustrated in \autoref{figure:attrib_memory}.
+    \item Iterating over the attribs, reading the key string and the size of the data.
+    \item Recreating the attrib key-value pair using the key and copying the data.
+\end{enumerate}
+
+After the linearized attrib map has been read and the attrib key-value pairs have been recreated in the importing process, the original state of the data has to be recreated.
+For this purpose, the user has to supply an \emph{unpack} function with the signature shown in \autoref{lst:unpacking_function}.
+The unpack function takes the \lstinline|std::pair<std::string, void*>| created earlier, which consists of the attrib key and a pointer to a single contiguous memory block
+and returns the attrib in its original state, as it was before the \emph{pack} function was called by the exporting process.
+
+\begin{lstlisting}[language=c++, numbers=none, caption=Unpack Function Declaration, captionpos=b, breaklines=true, label={lst:unpacking_function}]
+    std::pair<std::string, void *> unpack(size_t size, std::pair<std::string, void *> attrib);
+\end{lstlisting}
+
+In the example of the linked list used in \autoref{subsection:packing_and_exporting}, the \emph{unpack} function would receive a key value pair containing the attrib key
+and the \emph{int} array created by the \emph{pack} function earlier as well as the total size of the array in byte.
+
+The \emph{unpack} function would then recreate the original linked list by reading the individual elements of the array and return the original attrib key value pair containing
+the key string and the pointer to the linked list.
 
 \section{DataPaths}

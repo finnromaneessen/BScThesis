@@ -152,7 +152,7 @@ The \emph{CopyVector} struct consists of an \emph{offset} and a \emph{size} vari
 While recreating the component in the importing process, the \emph{CopyVector} can simply be replaced by a regular vector again, using the copied data by resolving the offset and size.
 
 \subsection{Importing Components}
-Since the component tree is transformed into a single contiguous memory block, simply using \emph{memcpy()} to import the topology into the processes private memory will not work.
+Since the component tree is transformed into a single contiguous memory block and all regular pointers are replaced by offset based pointers, simply using \emph{memcpy()} to import the topology into the processes private memory will not work.
 
 Importing the component tree into the receiving processes memory is done as follows:
 
@@ -167,6 +167,88 @@ To recreate the \emph{children} vector, the offsets of the children stored in th
 need to replaced with pointers to their respective memory addresses in the importing process.
 
 \section{Attribs}
-Components and DataPaths have an \emph{attrib} map that stores key-value pairs that can be used to add arbitrary data of any size.
-It is implementated as a \lstinline{std::map<std::string, void*>}, mapping strings to 
+[Example and default attribs?] %TODO
+Apart from the predefined properties each component subclass uses to represent the underlying hardware, Components and DataPaths have an \emph{attrib} map storing key-value pairs that can be used to add arbitrary data of any size.
+It is implemented as a \lstinline{std::map<std::string, void*>}, mapping strings to void pointers.
+
+This allows for a high degree of customization as there are no restrictions to the size or type of data. A string can just as easily be stored as a complex user-defined class.
+However, the highly versatile use of the \emph{attrib} map also makes it difficult to copy the attrib map, since the size of the data is not necessarily known in advance.
+
+\subsection{Packing and Exporting Attribs}
+User-defined attributes can have any size and are not necessarily stored contiguously, which makes copying them into the shared memory region difficult.
+
+A simple example for this problem is an \emph{attrib} storing a linked list. Each item in the list is stored in a different memory location,
+the \emph{attrib}'s pointer pointing to the first element. The memory utilization of the list also directly depends on its size, which may change during the runtime of the program.
+
+If an \emph{attrib} needs to be exported along with the component, the user needs to supply its size and provide the data as a single contiguous memory block.
+In the example of the linked list, the list could be transformed into an array containing the same data.
+
+For this purpose the user passes a pointer to function that transforms the \emph{attrib} into a \emph{CopyAttrib} struct as shown in \autoref{lst:copyattrib}.
+\emph{CopyAttribs} consist of the attribs \emph{key}, a \emph{size} variable storing the datas total size in byte and a pointer to the linearized data block.
+
+\begin{figure}[!ht] %TODO Fix position
+    \includegraphics[scale=0.1, angle=90]{images/packing.jpg} %TODO Replace graphic
+    \centering
+    \caption{Packing a Linked List}
+    \label{figure:packing_example}
+\end{figure}
+
+\autoref{figure:packing_example} illustrates using the \emph{pack} function supplied by the user
+to transform an \emph{attrib} pointing to a linked list into a \emph{CopyAttrib} containing the \emph{attribs} key,
+its data as a contiguous memory block and the datas size in byte.
+
+\begin{lstlisting}[language=c++, numbers=left, caption=CopyAttrib Struct, captionpos=b, label={lst:copyattrib}]
+    struct CopyAttrib {
+        std::string key;
+        size_t size;
+        void* data;
+    };
+\end{lstlisting}
+
+\autoref{lst:packing_function} shows how the user-defined \emph{pack} function for the linked list example could be implemented.
+It takes a \lstinline|std::pair<std::string, void*>| containing an attribs key-value pair as a parameter and returns a \emph{CopyAttrib} containing the packed attrib.
+
+In line 2, the \emph{pack} function compares the supplied key with all defined attrib keys to determine, what kind of data the attrib contains.
+In this case, the key \lstinline|"EXAMPLE_KEY"| is associated with a linked list of \emph{ints}.
+A new \emph{int} array of the same size as the list is allocated in line 4 to store the lists elements in a contiguous memory block.
+In lines 7-9 the array is then filled by iterating over the list and placing it elements in the array one by one.
+Finally, a \emph{CopyAttrib} consisting of the original key, the arrays size and a pointer to the array is returned in line 11.
+
+Depending on the associated data, not every attrib is necessarily relevant to the receiving process.
+If an attrib doesn't need to be exported with the rest of the component, the \emph{pack} function can simply return \lstinline|{key, 0, nullptr}| as shown in line 13
+to indicate that the data belonging to a specific key ode not need to be copied.
+
+\begin{lstlisting}[language=c++, numbers=left, caption=Example Packing Function, captionpos=b, label={lst:packing_function}]
+  CopyAttrib pack(std::pair<std::string, void*> attrib) {
+    if (!attrib.first.compare("EXAMPLE_KEY")) {
+        std::list<int>* list = (std::list<int>*)attrib.second;
+        int* arr = new int[list->size()];
+        auto i = 0;
+
+        for (const auto& item : *list) {
+            arr[i] = item;
+        }
+
+        return {attrib.first, sizeof(int) * list->size(), arr};
+    }
+    return {key, 0, nullptr};
+  }
+\end{lstlisting}
+
+To export the components attribs, they need to be arranged into a contiguous memory block.
+This is done by writing the individual \emph{CopyVectors} provided by the \emph{pack} function sequentially into the shared memory segment.
+
+\autoref{figure:attrib_memory} shows how the linearized attrib map is arranged in the shared memory.
+
+As the number and size of the attribs varies heavily, the linearized attrib map is preceeded by a \lstinline|size_t num_attribs| variable in the shared memory,
+as illustrated in \autoref{figure:attrib_memory}.
+The \lstinline|num_attribs| value indicates the number of attribs exported from the components map to the importing process.
+
+\begin{figure}[!ht]
+    \includegraphics[scale=0.1]{images/attrib_memory.jpg} %TODO Replace graphic
+    \centering
+    \caption{Attribs in Shared Memory}
+    \label{figure:attrib_memory}
+\end{figure}
+
 \section{DataPaths}

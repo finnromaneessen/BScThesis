@@ -15,3 +15,4 @@
 **/*.run.xml
 **/*.blg
 **/*.fdb_latexmk
+.DS_Store

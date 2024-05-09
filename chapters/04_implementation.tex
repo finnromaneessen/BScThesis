@@ -166,7 +166,7 @@ Importing the component tree into the receiving processes memory is done as foll
 To recreate the \emph{children} vector, the offsets of the children stored in the \emph{CopyVector}, as described in \autoref{subsection:export_components},
 need to replaced with pointers to their respective memory addresses in the importing process.
 
-\section{Attribs}
+\section{Attribs}\label{section:attribs}
 [Example and default attribs?] %TODO
 Apart from the predefined properties each component subclass uses to represent the underlying hardware, Components and DataPaths have an \emph{attrib} map storing key-value pairs that can be used to add arbitrary data of any size.
 It is implemented as a \lstinline{std::map<std::string, void*>}, mapping strings to void pointers.
@@ -276,3 +276,72 @@ The \emph{unpack} function would then recreate the original linked list by readi
 the key string and the pointer to the linked list.
 
 \section{DataPaths}
+Apart from the component tree, sys-sage topologies, consist of \emph{DataPaths}.
+DataPaths are used to connect two components of the component tree, to represent arbitrary relations between them.
+
+\autoref{lst:datapath_class} shows part of the DataPath class implementation.
+DataPaths have \emph{source} and \emph{target} component pointers, as shown in line 6 and 7, that represent the components connected by the DataPath.
+
+Additionally, DataPaths can either be oriented, meaning that the source and target components are differentiated, or bidirectional, which is indicated by the \emph{oriented} variable.
+The \emph{dp\_type} variable can be used to attach additional inforamtion about the nature of the relation between the components, such as a physical hardware connection or a shared cache.
+
+Just like components, DataPaths have an \emph{attrib} map, which can be used to attach arbitrary data to the DataPaths using key-value pairs.
+
+\begin{lstlisting}[language=c++, numbers=left, caption=DataPath Class, captionpos=b, label={lst:datapath_class}]
+    class DataPath {
+      public:
+        map<string, void*> attrib;
+
+      private:
+        Component* source;
+        Component* target;
+
+        const int oriented;
+        const int dp_type;
+    };
+\end{lstlisting}
+
+\subsection{Exporting DataPaths}\label{subsection:export_dps}
+Since DataPaths are used to connect two components, they only need to be exported if both the source and target component are exported. %TODO align
+While exporting the component tree, each components DataPaths will be put in a \lstinline|std::map<DataPath*, std::pair<size_t, size_t>>|,
+mapping the DataPath to a \lstinline|std::pair<size_t, size_t>|, storing the offsets of the DataPaths components in the shared memory region.
+
+After the entire component tree is exported, it can easily be determined, which DataPaths need to be exported, by checking if both component offsets are set.
+
+The actual export process for the DataPaths works as follows:
+
+\begin{enumerate}
+    \item Writing the total number of DataPaths exported to the shared memory region.
+    \item Writing the offsets of the DataPaths source and target components, relative to the top of the memory mapped file, to the shared memory.
+    \item Exporting the actual DataPath object using \emph{memcpy()}.
+    \item Exporting the DataPaths \emph{attribs} using the eporvided \emph{pack} function as descibed in \autoref{section:attribs}.
+\end{enumerate}
+
+\begin{figure}[!ht] %TODO Fix position
+    \includegraphics[scale=0.15]{images/export_dps.jpg} %TODO Replace graphic
+    \centering
+    \caption{DataPaths in Shared Memory}
+    \label{figure:export_dps}
+\end{figure}
+
+\autoref{figure:export_dps} illustrates how the DataPaths are arrangend in the shared memory file.
+
+\subsection{Importing DataPaths}
+To import the DataPaths into the local memory of the receiving process, the steps described in \autoref{subsection:export_dps} need to be reversed:
+
+\begin{enumerate}
+    \item Reading the total number of DataPaths from the top of the DataPaths memory region.
+    \item Iterating over the shared memory block reading the source and target offsets and recreating the DataPath object using its copy constructor.
+\end{enumerate}
+
+Since the components have been imported into the local memory and thus have a new memory location, the read offsets need to be translated to regular pointers
+pointing to the components new memory location.
+
+For this purpose, a \lstinline|std::map<size_t, Component*>| is created while exporting the component tree, mapping the components offset in the shared memory region to its
+memory location in the importing process.
+
+\begin{enumerate}
+    \setcounter{enumi}{2}
+    \item Recreating the DataPaths source and target pointers and adding the DataPath to the components DataPath vectors.
+    \item Importing the DataPaths \emph{attribs} using the provided \emph{unpack} function as descibed in \autoref{section:attribs}.
+\end{enumerate}

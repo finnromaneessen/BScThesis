@@ -5,6 +5,7 @@ Due to the large number of cores used in high-performance computing (HPC), Non-U
 NUMA systems use a distributed memory hierarchy to allow cores faster access to local memory regions, whereas accessing non-local memory can cause severe performance decreases. \cite{nuioa_intro}
 
 Due to the high degree of parallelization in HPC systems, memory bandwith and cache usage have tremendous impact on the overall performance. \cite{openmp_intro}
+
 Thus, making full use of the hardware topology to schedule threads accordingly is crucial in HPC clusters.
 Threads working closely together will often benefit from sharing a cache to utilize local memory as much as possible,
 whereas independant, memory intensive jobs could be better scheduled onto seperate proccessors so as not to limit their memory bandwith and available cache storage. \cite{hwloc_paper}
@@ -14,6 +15,7 @@ Hwloc is a software library that represents hardware resources such as cores or 
 to store easily accessible and versatile information about the hardware topology of HPC systems. \cite{hwloc_paper}
 
 Hwloc collects the entire topology information at startup and makes the static information available to the application. \cite{hwloc_paper}
+
 While this approach offers better performance due to the low overhead at runtime, the topology tree can't be adapted to dynamically changing factors at runtime.
 
 Sys-sage \cite{sys-sage} is a library that extends hwlocs functionality to include dynamically changing hardware information and allow representation of arbitrary custom data.

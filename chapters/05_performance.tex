@@ -1,0 +1,25 @@
+\chapter{Performance}\label{chapter:Performance}
+In the context of high-performance computing, where computational performance and efficiency are crucial, it is paramount to analyse every small piece of software used in the cluster.
+This is especially important for this thesis, as the \emph{sys-sage} library is designed to be used in complex, heterogenous high-performance compute clusters with complicated hierarchical hardware topologies.
+
+As such, analysing the shared memory implementation of this thesis on metrics such as execution time and scalability is unavoidable.
+
+Since the memory footprint of a topology in shared memory is mostly dependant on the size of the topology itself, with little overhead created by the export process,
+the memory impact of sharing topolgies using this implementation will not be evaluated as part of this thesis.
+
+\section{Execution}
+To perform the performance analysis of the \emph{sys-sage} shared memory implementation, a series of sample topologies will be created, each with different compositions of components, DataPaths and attributes.
+
+The different topologies will then be exported into shared memory regions and subsequently imported into the local memory of another process,
+measuring import and export times seperately.
+
+To investigate the scalability of the implementation, each topology will be evaluated in multiple sizes, adding more components, DataPaths or attribs as needed.
+
+All performance tests will be executed on an Apple M1 processor with 16GB of RAM.
+To create a more reliable performance analysis, all topologies will be evaluated multiple times and the average execution times will be calculated.
+
+\section{Basic Component Tree}
+For the first performance test, a simple component tree without any DataPaths or attribs is created.
+
+\section{DataPaths}
+\section{Attribs}

@@ -1,6 +1,13 @@
 \chapter{Introduction}\label{chapter:introduction}
-\section{Motivation}
+In high-performance computing (HPC), powerful, highly parallel computers are used to solve various technical challenges in all major scientific areas or any other applications processing
+large amounts of data or handling large-scale computations. \cite{hpc_intro}
 
+HPC clusters are complex, heterogenous systems, consisting of many nodes, each with an increasing number of cores.
+The hierarchical composition of an HPC systems hardware architecture and its individual components is referred to as hardware \emph{topology}. \cite{topology_intro}
+
+The Message Passing Interface (MPI) is commonly used in HPC systems and other parallel machines to communicate between processes and nodes within the cluster. \cite{mpi_intro} 
+
+\section{Motivation}
 Due to the large number of cores used in high-performance computing (HPC), Non-Uniform Memory Access (NUMA) is often used in HPC clusters to achieve more efficient memory access.
 NUMA systems use a distributed memory hierarchy to allow cores faster access to local memory regions, whereas accessing non-local memory can cause severe performance decreases. \cite{nuioa_intro}
 

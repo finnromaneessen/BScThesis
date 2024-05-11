@@ -25,7 +25,7 @@ In lines 5-6, a \lstinline|std::chrono::duration| is created, representing the t
 %TODO QUOTE
 \begin{lstlisting}[language=c++, numbers=left, caption= Measuring the Execution Time, captionpos=b, label={lst:perf_code}]
     auto time_start = std::chrono::steady_clock::now();
-    SharedMemory* memman = export_component(path, topo, pack);
+    SharedMemory* shmem = export_component(path, topo, pack);
     auto time_end = std::chrono::steady_clock::now();
 
     std::chrono::duration<double, std::milli> duration =

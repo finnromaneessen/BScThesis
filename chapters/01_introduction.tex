@@ -2,20 +2,23 @@
 In high-performance computing (HPC), powerful, highly parallel computers are used to solve various technical challenges in all major scientific areas or any other applications processing
 large amounts of data or handling large-scale computations. \cite{hpc_intro}
 
-HPC clusters are complex, heterogenous systems, consisting of many nodes, each with an increasing number of cores.
+HPC clusters are complex, heterogenous systems, consisting of many nodes, each with an ever increasing number of cores.
 The hierarchical composition of an HPC systems hardware architecture and its individual components is referred to as hardware \emph{topology}. \cite{topology_intro}
 
-The Message Passing Interface (MPI) is commonly used in HPC systems and other parallel machines to communicate between processes and nodes within the cluster. \cite{mpi_intro} 
+The Message Passing Interface (MPI) is commonly used in HPC systems and other parallel machines to communicate between processes and nodes within the cluster.
+This allows each node in a HPC system to execute independant programs in its own local memory, while still cooperating and communicating with the entire cluster as needed. \cite{mpi_intro}
 
-\section{Motivation}
-Due to the large number of cores used in high-performance computing (HPC), Non-Uniform Memory Access (NUMA) is often used in HPC clusters to achieve more efficient memory access.
+Due to the heterogenous composition of HPC systems and the high degrees of parallelization utilized,
+Non-Uniform Memory Access (NUMA) is often used in HPC clusters to achieve more efficient memory access.
 NUMA systems use a distributed memory hierarchy to allow cores faster access to local memory regions, whereas accessing non-local memory can cause severe performance decreases. \cite{nuioa_intro}
 
-Due to the high degree of parallelization in HPC systems, memory bandwith and cache usage have tremendous impact on the overall performance. \cite{openmp_intro}
+As memory bandwidth and cache usage have tremendous impact on the overall performance of highly parallelized HPC systems,
+making full use of the hardware topology to schedule processes accordingly is crucial in HPC clusters. \cite{openmp_intro}
 
-Thus, making full use of the hardware topology to schedule threads accordingly is crucial in HPC clusters.
-Threads working closely together will often benefit from sharing a cache to utilize local memory as much as possible,
+Jobs working closely together will often benefit from sharing a cache to utilize local memory as much as possible,
 whereas independant, memory intensive jobs could be better scheduled onto seperate proccessors so as not to limit their memory bandwith and available cache storage. \cite{hwloc_paper}
+
+Making use of the hardware topology to create an efficient process-mapping, has the added advantage of reducing the overall communication costs, as related processes will be physically close within the cluster. \cite{topology_intro}
 
 Many tools, such as \emph{Portable Hardware Locality (hwloc)} \cite{hwloc} already exist to gather information about the hardware topology and make it available for these purposes.
 Hwloc is a software library that represents hardware resources such as cores or caches in a hierarchical tree structure
@@ -28,5 +31,16 @@ While this approach offers better performance due to the low overhead at runtime
 Sys-sage \cite{sys-sage} is a library that extends hwlocs functionality to include dynamically changing hardware information and allow representation of arbitrary custom data.
 Since sys-sage is fully compatible with hwloc, users can easily use hwloc to initialize their topology data and complement it with custom data as needed.
 
-\section{Related Work Or Objectives}
-%TODO Write something or add objectives to Motivation
+\section{Motivation}
+As mentioned above, using acurate and current information on the hardware topology of a HPC system
+has many applications in optimizing the overall performance of individual programs within the cluster.
+
+Creating a detailed topology in sys-sage can cost significant resources during setup, as many custom attributes, components and DataPaths might need to be created.
+
+Since the hardware topologies of different processes within a node are equal
+and different nodes within a cluster often have signifcant overlap in their topologies, creating new topologies in each process and node would cause unnecessary overhead.
+
+Instead, sharing entire topologies or specific component subtrees across processes and nodes of HPC systems could be used to reduce redundant creations of sys-sage topologies.
+
+
+\section{Related Work}

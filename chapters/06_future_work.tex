@@ -1,1 +1,22 @@
-\chapter{Future Work}
+\chapter{Conclusion and Future Work}
+In this thesis, a file backed shared memory system was implemented,
+which expands the existing sys-sage library to allow users to share sys-sage topologies between processes and nodes in HPC systems.
+
+The systems creates memory mapped files, shared between different processes, which can then be used to transfer topologies between the processes.
+To do this, all necessary components, DataPaths and attribs need to be copied into the shared memory region by the exporting process.
+Any process wishing to import the topology can then use this memory region to recreate the topology in its local memory.
+
+One of the main drawbacks of the shared memory system implemented in this thesis is its inability to update shared topologies once they have been exported.
+This could be an issue for sys-sage users, as topologies are often prone to frequent changes and updates, such as regular measurements being saved in a components attribs.
+As it stands, each process would either have to provide its own version of the necessary measurements, or the the components in question would have to be exported after every update.
+Either solution could have significant impact on the systems performance, depending on the size of the components and the frequency of the updates.
+
+In the future, it could be beneficial to implement additional functionality allowing users to update existing shared topologies without having to redo the entire export.
+Ideally, every process would be able to create updates to shared topologies, not just the process that originally exported the topology.
+
+This would make it much easier for users to keep all their processes up to date on the topology of the HPC system.
+
+Additionally, it would be convenient if shared component subtrees could be automatically integrated into the topology of receiving processes.
+This would make it much easier for users to share smaller parts of topologies, without having to add it to the topology manually.
+
+Despite these drawbacks, the shared memory implementation works as intended and provides the necessary tools to share topologies within HPC systems.

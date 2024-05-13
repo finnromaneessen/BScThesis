@@ -11,7 +11,7 @@ This design was chosen, as it cannot necessarily be guaranteed that a sufficient
 Additionally, at the time of exporting the topology into the shared memory region, it is not always known, which processes will need to import the topology.
 
 However, using offset based pointers also means that the topology will have to be deconstructed before being copied into the shared memory region, as some internal components, such as vectors or maps,
-use rely on regular pointers that will not work within the shared region.
+rely on regular pointers that will not work within the shared region.
 
 Due to the topology being deconstructed before being copied to the shared region,
 it cannot be used directly in the shared memory block and needs to be reconstructed in the local memory of the importing process before being usable again.
@@ -24,8 +24,9 @@ the updated topology needs to be shared entirely anew.
 
 \section{Capabilities}
 In essence, the shared memory implementation of this thesis consists of two main functions.
+
 With \lstinline|export_topology()| the exporting process can create a new shared memory region in a provided file location and
 copy a chosen topology or component subtree including DataPaths and attribs into the newly created file backed memory region.
-The \lstinline|export_topology()| function also allows the user to chose, which of the topologies attribs will be exported into the shared memory region.
+The \lstinline|export_topology()| function also allows the user to choose, which of the topologies attribs will be exported into the shared memory region.
 
 Any process wishing to use the shared topology can then use \lstinline|import_topology()| to recreate the topology in its local memory.

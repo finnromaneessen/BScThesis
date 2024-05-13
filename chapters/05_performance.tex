@@ -18,12 +18,12 @@ To investigate the scalability of the implementation, each topology will be eval
 All performance tests will be executed on an Apple M1 processor with 16GB of RAM.
 To create a more reliable performance analysis, all topologies will be evaluated multiple times and the average execution times will be calculated.
 
-\autoref{lst:perf_code} shows how the execution time of exporting a topology is measured. In line 1 and 3, the current time is taken before and after the execution of the measured code section.
+\autoref{lst:performance_code} shows how the execution time of exporting a topology is measured. In line 1 and 3, the current time is taken before and after the execution of the measured code section.
 This is done using \lstinline|std::chrono::steady_clock|, an implementation of a \emph{monotonic} clock, best suited for measuring time intervals \cite{monotonic_clock}.
 In lines 5-6, a \lstinline|std::chrono::duration| is created, representing the time elapsed between \emph{time\_start} and \emph{time\_end}, which is the execution time of the measured code region.
 
 %TODO QUOTE
-\begin{lstlisting}[language=c++, numbers=left, caption= Measuring the Execution Time, captionpos=b, label={lst:perf_code}]
+\begin{lstlisting}[language=c++, numbers=left, caption= Measuring the Execution Time, captionpos=b, label={lst:performance_code}]
     auto time_start = std::chrono::steady_clock::now();
     SharedMemory* shmem = export_component(path, topo, pack);
     auto time_end = std::chrono::steady_clock::now();

@@ -12,12 +12,12 @@ If at any point during the lifetime of a sys-sage topology,
 
 %\section{Limitations}
 \section{Shared Memory}
-The data sharing aspect of the implementation is realized using shared memory regions. These regions are created by opening files and mapping them using \emph{mmap()}. %TODO code styling?
+The data sharing aspect of the implementation is realized using shared memory regions. These regions are created by opening files and mapping them using \lstinline{mmap()}.
 
-\emph{mmap()} is a syscall that creates file backed memory mappings in the program's virtual address space that can be opened by multiple processes at once.
+\lstinline{mmap()} is a syscall that creates file backed memory mappings in the program's virtual address space that can be opened by multiple processes at once.
 The mapped file can then be used just like any regular memory location. \cite{crotty22-mmap}
 
-Using the \emph{MAP\_FIXED} flag when creating a \emph{mmap()} backed memory location will guarantee the virtual memory addresses to be equal across processes.
+Using the \emph{MAP\_FIXED} flag when creating a \lstinline{mmap()} backed memory location will guarantee the virtual memory addresses to be equal across processes.
 However, if the necessary memory location is not available in the current process, the mapping will fail, which could potentially have a major impact on the reliability of the library,
 depending on the total available memory and its current utilization. [Quote manpage mmap] %TODO
 
@@ -60,7 +60,7 @@ The \emph{mem} pointer always points to the top of the memory region, whereas th
 
 When a shared memory region is first created by the process sharing the topology, the path to the file used in the mapping as well as the total size needed have to be known.
 The allocated size is then written to the start of the mapped file, to be read by other processes when importing the topology.
-The file-backed memory region can then be used to export the topology until the \emph{SharedMemory} destructor is called and the file is unmapped using \emph{munmap()}.
+The file-backed memory region can then be used to export the topology until the \emph{SharedMemory} destructor is called and the file is unmapped using \lstinline{munmap()}.
 
 The process importing the topology then uses the constructor in line 9 of \autoref{lst:sharedmemory}, which opens and maps the previously created file,
 reads the total size of the data as written by the first process and then remaps the file to that size.
@@ -112,7 +112,7 @@ To export the topology into the shared memory region, the component tree structu
 Copying the component tree into the shared memory region is performed as follows:
 \begin{enumerate}
     \item Determining the size of the component based on its \emph{componentType}.
-    \item Copying the \emph{Component} object into the shared region using \emph{memcpy()} and the size determined previously.
+    \item Copying the \emph{Component} object into the shared region using \lstinline{memcpy()} and the size determined previously.
     \item Copying the \emph{attrib} map.
     \item Copying the \emph{children} vector.
     \item Recursively copying the children.
@@ -152,7 +152,7 @@ The \emph{CopyVector} struct consists of an \emph{offset} and a \emph{size} vari
 While recreating the component in the importing process, the \emph{CopyVector} can simply be replaced by a regular vector again, using the copied data by resolving the offset and size.
 
 \subsection{Importing Components}
-Since the component tree is transformed into a single contiguous memory block and all regular pointers are replaced by offset based pointers, simply using \emph{memcpy()} to import the topology into the processes private memory will not work.
+Since the component tree is transformed into a single contiguous memory block and all regular pointers are replaced by offset based pointers, simply using \lstinline{memcpy()} to import the topology into the processes private memory will not work.
 
 Importing the component tree into the receiving processes memory is done as follows:
 
@@ -313,7 +313,7 @@ The actual export process for the DataPaths works as follows:
 \begin{enumerate}
     \item Writing the total number of DataPaths exported to the shared memory region.
     \item Writing the offsets of the DataPaths source and target components, relative to the top of the memory mapped file, to the shared memory.
-    \item Exporting the actual DataPath object using \emph{memcpy()}.
+    \item Exporting the actual DataPath object using \lstinline{memcpy()}.
     \item Exporting the DataPaths \emph{attribs} using the provided \emph{pack} function as described in \autoref{section:attribs}.
 \end{enumerate}
 

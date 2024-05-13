@@ -1,17 +1,17 @@
 \chapter{Performance}\label{chapter:Performance}
-In the context of high-performance computing, where computational performance and efficiency are crucial, it is paramount to analyse every small piece of software used in the cluster.
-This is especially important for this thesis, as the \emph{sys-sage} library is designed to be used in complex, heterogenous high-performance compute clusters with complicated hierarchical hardware topologies.
+In the context of high-performance computing, where computational performance and efficiency are crucial, it is paramount to analyze every small piece of software used in the cluster.
+This is especially important for this thesis, as the \emph{sys-sage} library is designed to be used in complex, heterogeneous high-performance compute clusters with complicated hierarchical hardware topologies.
 
-As such, analysing the shared memory implementation of this thesis on metrics such as execution time and scalability is unavoidable.
+As such, analyzing the shared memory implementation of this thesis on metrics such as execution time and scalability is unavoidable.
 
-Since the memory footprint of a topology in shared memory is mostly dependant on the size of the topology itself, with little overhead created by the export process,
-the memory impact of sharing topolgies using this implementation will not be evaluated as part of this thesis.
+Since the memory footprint of a topology in shared memory is mostly dependent on the size of the topology itself, with little overhead created by the export process,
+the memory impact of sharing topologies using this implementation will not be evaluated as part of this thesis.
 
 \section{Execution}
 To perform the performance analysis of the \emph{sys-sage} shared memory implementation, a series of sample topologies will be created, each with different compositions of components, DataPaths and attributes.
 
 The different topologies will then be exported into shared memory regions and subsequently imported into the local memory of another process,
-measuring import and export times seperately.
+measuring import and export times separately.
 
 To investigate the scalability of the implementation, each topology will be evaluated in multiple sizes, adding more components, DataPaths or attribs as needed.
 

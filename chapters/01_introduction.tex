@@ -2,25 +2,25 @@
 In high-performance computing (HPC), powerful, highly parallel computers are used to solve various technical challenges in all major scientific areas or any other applications processing
 large amounts of data or handling large-scale computations. \cite{hpc_intro}
 
-HPC clusters are complex, heterogenous systems, consisting of many nodes, each with an ever increasing number of cores.
+HPC clusters are complex, heterogeneous systems, consisting of many nodes, each with an ever increasing number of cores.
 The hierarchical composition of an HPC systems hardware architecture and its individual components is referred to as hardware \emph{topology}. \cite{topology_intro}
 
 The Message Passing Interface (MPI) is commonly used in HPC systems and other parallel machines to communicate between processes and nodes within the cluster.
-This allows each node in a HPC system to execute independant programs in its own local memory, while still cooperating and communicating with the entire cluster as needed. \cite{mpi_intro}
+This allows each node in a HPC system to execute independent programs in its own local memory, while still cooperating and communicating with the entire cluster as needed. \cite{mpi_intro}
 
-Due to the heterogenous composition of HPC systems and the high degrees of parallelization utilized,
+Due to the heterogeneous composition of HPC systems and the high degrees of parallelization utilized,
 Non-Uniform Memory Access (NUMA) is often used in HPC clusters to achieve more efficient memory access.
 NUMA systems use a distributed memory hierarchy to allow cores faster access to local memory regions, whereas accessing non-local memory can cause severe performance decreases. \cite{nuioa_intro}
 
 As memory bandwidth and cache usage have tremendous impact on the overall performance of highly parallelized HPC systems,
 making full use of the hardware topology to schedule processes accordingly is crucial in HPC clusters. \cite{openmp_intro}
 
-Jobs working closely together will often benefit from sharing a cache to utilize local memory as much as possible,
-whereas independant, memory intensive jobs could be better scheduled onto seperate proccessors so as not to limit their memory bandwith and available cache storage. \cite{hwloc_paper}
+Processes working closely together will often benefit from sharing a cache to utilize local memory as much as possible,
+whereas independent, memory intensive processes could be better scheduled onto separate processors so as not to limit their memory bandwidth and available cache storage. \cite{hwloc_paper}
 
-Making use of the hardware topology to create an efficient process-mapping, has the added advantage of reducing the overall communication costs, as related processes will be physically close within the cluster. \cite{topology_intro}
+Making use of the hardware topology to create an efficient process-mapping has the added advantage of reducing the overall communication costs as related processes will be physically close within the cluster. \cite{topology_intro}
 
-Many tools, such as \emph{Portable Hardware Locality (hwloc)} \cite{hwloc} already exist to gather information about the hardware topology and make it available for these purposes.
+Many tools, such as \emph{Portable Hardware Locality (hwloc)} \cite{hwloc}, already exist to gather information about the hardware topology and make it available for these purposes.
 Hwloc is a software library that represents hardware resources such as cores or caches in a hierarchical tree structure
 to store easily accessible and versatile information about the hardware topology of HPC systems. \cite{hwloc_paper}
 
@@ -32,25 +32,27 @@ Sys-sage \cite{sys-sage} is a library that extends hwlocs functionality to inclu
 Since sys-sage is fully compatible with hwloc, users can easily use hwloc to initialize their topology data and complement it with custom data as needed.
 
 \section{Motivation}
-As mentioned above, using acurate and current information on the hardware topology of a HPC system
+As mentioned above, using accurate and current information on the hardware topology of a HPC system
 has many applications in optimizing the overall performance of individual programs within the cluster.
 
 Creating a detailed topology in sys-sage can cost significant resources during setup, as many custom attributes, components and DataPaths might need to be created.
 
 Since the hardware topologies of different processes within a node are usually very similar
-and different nodes within a cluster often have signifcant overlap in their topologies as well, creating new topologies in each process and node would cause unnecessary overhead.
+and different nodes within a cluster often have significant overlap in their topologies as well, creating new topologies in each process and node would cause unnecessary overhead.
 
 Instead, sharing entire topologies or specific component subtrees across processes and nodes of HPC systems could be used to reduce redundant creations of sys-sage topologies.
 
+The objective of this thesis is to add a file backed shared memory implementation to sys-sage, which allows user to share entire topologies or select subtrees with other processes or nodes.
+
 \section{Related Work}
-Sharing data between processes and nodes using memory mapped files is not a new concept. In fact, it is widely use across many different sectors many different applications and sectors such as
+Sharing data between processes and nodes using memory mapped files is not a new concept. In fact, it is widely used across many different sectors many different applications and sectors such as
 database management systems and data mining. \cite{crotty22-mmap} \cite{mmap_related_work}
 
-This section highlights different approaches to sharing large amounts of data between processes and nodes using memory mapped files, as implemeneted by different libraries.
+This section highlights different approaches to sharing large amounts of data between processes and nodes using memory mapped files as implemented by different libraries.
 
 \subsection*{hwloc}
-As mentioned above, portable hardware locality (hwloc) is the software library sys-sage bases its functionality and use cases on.
-Much like sys-sage, hwloc is used to manage information about a systems hardware topology, to improve the performance of HPC clusters.
+As mentioned above, portable hardware locality (hwloc) is the software library on which sys-sage bases its functionality and use cases.
+Much like sys-sage, hwloc is used to manage information about a systems hardware topology to improve the performance of HPC clusters.
 
 Hwloc offers users the option to share topologies between processes. To do this, the exporting process must use the \lstinline|hwloc_shmem_topology_write()| function,
 which copies the topology into a previously created memory mapped file. The duplicated topology can then be \emph{adopted} by importing processes using \lstinline|hwloc_shmem_topology_adopt()|.
@@ -60,7 +62,7 @@ The hwloc shared memory implementation uses file backed memory mappings with ide
 To achieve this, hwloc requires the user to find a memory region of sufficient size that is available in all processes.
 
 This approach has the advantage that pointers inside the memory mapped region will work as usual,
-which means the shared topology can be used directly from within the shared memory section, without having to be copied into the local memory of importing processes.
+which means the shared topology can be used directly from within the shared memory section without having to be copied into the local memory of importing processes.
 
 On the other hand, this approach puts more responsibility and effort on the users side, as finding a sufficiently large memory region might be difficult to achieve.
 Additionally, at the time of exporting the topology, it might not be fully known which processes will be adopting the shared topology during its lifetime, so the chosen memory section might not be available in
@@ -77,4 +79,4 @@ Contrary to hwlocs implementation, sharedstructures uses offset based pointers w
 as the memory sections are resizable and thus might move during their lifetimes.
 
 Sharedstructures provides custom allocators to manage the data structures in the shared memory region.
-These allocators are used to reserve memory space within the shared region and can be chosen based on the specific memory usage profile of the program.
+These allocators are used to reserve memory space within the shared region and can be chosen based on the memory usage profile of the program.

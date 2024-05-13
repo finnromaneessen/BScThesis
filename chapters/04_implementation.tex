@@ -4,7 +4,7 @@
 
 The part of the sys-sage library implemented in this thesis enables users to share component subtrees or whole topologies between processes of a compute node by using shared memory regions.
 
-To achieve this, all components of the given subtree, including its attruibutes and all DataPaths, are copied into a memory region shared between the involved processes.
+To achieve this, all components of the given subtree, including its attributes and all DataPaths, are copied into a memory region shared between the involved processes.
 The component tree and DataPath graph are then recreated in the memory of the receiving process.
 
 \section{Capabilities and Usage}
@@ -12,7 +12,7 @@ If at any point during the lifetime of a sys-sage topology,
 
 %\section{Limitations}
 \section{Shared Memory}
-The data sharing aspect of the implementation is realised using shared memory regions. These regions are created by opening files and mapping them using \emph{mmap()}. %TODO code styling?
+The data sharing aspect of the implementation is realized using shared memory regions. These regions are created by opening files and mapping them using \emph{mmap()}. %TODO code styling?
 
 \emph{mmap()} is a syscall that creates file backed memory mappings in the program's virtual address space that can be opened by multiple processes at once.
 The mapped file can then be used just like any regular memory location. \cite{crotty22-mmap}
@@ -32,7 +32,7 @@ While this might not be possible for more general uses of offset pointers, as th
 it is practical for the particular use-case of this thesis, since  memory regions are always handled as a whole and importing only parts of a shared component tree is not supported.
 
 Calculating the offsets based on a shared, fixed location has the advantage that the offset pointers can be used more similarly to regular pointers and don't need to be recalculated when shared.
-This means the location of components or DataPaths within the shared memory region can be compared or referenced without amiguity or confusion about the base of the offset.
+This means the location of components or DataPaths within the shared memory region can be compared or referenced without ambiguity or confusion about the base of the offset.
 
 The lifetime of the shared memory region is handled by a \emph{SharedMemory} object, as shown in \autoref{lst:sharedmemory}.
 
@@ -64,9 +64,9 @@ The file-backed memory region can then be used to export the topology until the 
 
 The process importing the topology then uses the constructor in line 9 of \autoref{lst:sharedmemory}, which opens and maps the previously created file,
 reads the total size of the data as written by the first process and then remaps the file to that size.
-This has the advantage that the total size of the shared topology is always known to the importing process, without having to be provided seperately.
+This has the advantage that the total size of the shared topology is always known to the importing process, without having to be provided separately.
 To share a topology, only the path to the memory mapped file needs to be provided, all other information can be read from the file, which simplifies the API and makes it easier
-for users to share topologies without much inter-process comunication needed.
+for users to share topologies without much inter-process communication needed.
 
 
 [Size Calculation]%TODO
@@ -240,7 +240,7 @@ This is done by writing the individual \emph{CopyVectors} provided by the \emph{
 
 \autoref{figure:attrib_memory} shows how the linearized attrib map is arranged in the shared memory.
 
-As the number and size of the attribs varies heavily, the linearized attrib map is preceeded by a \lstinline|size_t num_attribs| variable in the shared memory,
+As the number and size of the attribs varies heavily, the linearized attrib map is preceded by a \lstinline|size_t num_attribs| variable in the shared memory,
 as illustrated in \autoref{figure:attrib_memory}.
 The \lstinline|num_attribs| value indicates the number of attribs exported from the components map to the importing process.
 
@@ -283,7 +283,7 @@ DataPaths are used to connect two components of the component tree, to represent
 DataPaths have \emph{source} and \emph{target} component pointers, as shown in line 6 and 7, that represent the components connected by the DataPath.
 
 Additionally, DataPaths can either be oriented, meaning that the source and target components are differentiated, or bidirectional, which is indicated by the \emph{oriented} variable.
-The \emph{dp\_type} variable can be used to attach additional inforamtion about the nature of the relation between the components, such as a physical hardware connection or a shared cache.
+The \emph{dp\_type} variable can be used to attach additional information about the nature of the relation between the components, such as a physical hardware connection or a shared cache.
 
 Just like components, DataPaths have an \emph{attrib} map, which can be used to attach arbitrary data to the DataPaths using key-value pairs.
 
@@ -314,7 +314,7 @@ The actual export process for the DataPaths works as follows:
     \item Writing the total number of DataPaths exported to the shared memory region.
     \item Writing the offsets of the DataPaths source and target components, relative to the top of the memory mapped file, to the shared memory.
     \item Exporting the actual DataPath object using \emph{memcpy()}.
-    \item Exporting the DataPaths \emph{attribs} using the eporvided \emph{pack} function as descibed in \autoref{section:attribs}.
+    \item Exporting the DataPaths \emph{attribs} using the provided \emph{pack} function as described in \autoref{section:attribs}.
 \end{enumerate}
 
 \begin{figure}[!ht] %TODO Fix position
@@ -324,7 +324,7 @@ The actual export process for the DataPaths works as follows:
     \label{figure:export_dps}
 \end{figure}
 
-\autoref{figure:export_dps} illustrates how the DataPaths are arrangend in the shared memory file.
+\autoref{figure:export_dps} illustrates how the DataPaths are arranged in the shared memory file.
 
 \subsection{Importing DataPaths}
 To import the DataPaths into the local memory of the receiving process, the steps described in \autoref{subsection:export_dps} need to be reversed:
@@ -343,5 +343,5 @@ memory location in the importing process.
 \begin{enumerate}
     \setcounter{enumi}{2}
     \item Recreating the DataPaths source and target pointers and adding the DataPath to the components DataPath vectors.
-    \item Importing the DataPaths \emph{attribs} using the provided \emph{unpack} function as descibed in \autoref{section:attribs}.
+    \item Importing the DataPaths \emph{attribs} using the provided \emph{unpack} function as described in \autoref{section:attribs}.
 \end{enumerate}

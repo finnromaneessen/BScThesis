@@ -33,10 +33,49 @@ In lines 5-6, a \lstinline|std::chrono::duration| is created, representing the t
 \end{lstlisting}
 
 \section{Basic Component Tree}
-For the first performance test, a simple component tree without any DataPaths or attribs is created.
+For the first performance test, a simple component tree without any DataPaths or attribs is created. The component tree consists of an increasing number of components in a straight line of children, similar to a linked list.
+
+\begin{figure}[ht]
+    \includegraphics[scale=0.75]{images/component_numbers.png} %TODO Improve graphic, Input real numbers
+    \centering
+    \caption{Performance Component Tree}
+    \label{figure:component_numbers}
+\end{figure}
+
+\autoref{figure:component_numbers} shows the execution time in milliseconds of exporting or importing this topology. As expected, the execution time grows linearly with the number of components in the topology.
+
+\section{Attribs}
+As complex sys-sage topologies can potentially have a lot of attribs that will often make up a major part of the total data amounts, evaluating the performance of exporting and importing
+attribs is paramount to analyzing the performance of the entire system.
+
+\begin{figure}[ht]
+    \includegraphics[scale=0.75]{images/attrib_numbers.png} %TODO Improve graphic
+    \centering
+    \caption{Performance Attrib Topology}
+    \label{figure:attrib_numbers}
+\end{figure}
+
+\autoref{figure:attrib_numbers} shows the execution time of exporting or importing a topology consisting of a single component, with increasing amounts of attribs.
+
+It is important to note that the performance of sharing complex data attached to an attrib will largely depend on the performance of the \emph{pack} and \emph{unpack} functions provided by the user.
+As this factor is impossible to quantify in a meaningful way, the attribs used for the purposes of this performance evaluation are simple integers that don't need to be packed or unpacked.
+
+\autoref{figure:attrib_numbers} shows a linear increase of the execution time with growing number of attribs shared. The performance of export and import are roughly equal, with the import slowing down faster with larger amounts of attribs.
 
 \section{DataPaths}
 To test the performance of exporting and importing DataPaths, a small topology consisting of only two nodes is created.
 These components are then connected by a large number of DataPaths without attribs or any additional data, so as not to skew the results.
 
-\section{Attribs}
+\begin{figure}[ht]
+    \includegraphics[scale=0.75]{images/dp_numbers.png} %TODO Improve graphic
+    \centering
+    \caption{Performance DataPath Topology}
+    \label{figure:dp_numbers}
+\end{figure}
+
+\autoref{figure:dp_numbers} shows the execution time of exporting or importing the topology described above with different amounts of DataPaths.
+Apart from some minor fluctuations, the execution time increases roughly linear with the amount of DataPaths in the topology.
+The results are as expected, as the DataPaths are simply one after the other, with very little overhead or other performance limiting factors.
+
+It is also notable that importing is consistently almost ten times faster than exporting.
+This is likely due to the exporting process needing to evaluate which DataPaths need to be exported, whereas the importing process can directly start importing.

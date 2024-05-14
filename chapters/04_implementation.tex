@@ -7,10 +7,6 @@ The part of the sys-sage library implemented in this thesis enables users to sha
 To achieve this, all components of the given subtree, including its attributes and all DataPaths, are copied into a memory region shared between the involved processes.
 The component tree and DataPath graph are then recreated in the memory of the receiving process.
 
-\section{Capabilities and Usage}
-If at any point during the lifetime of a sys-sage topology,
-
-%\section{Limitations}
 \section{Shared Memory}
 The data sharing aspect of the implementation is realized using shared memory regions. These regions are created by opening files and mapping them using \lstinline{mmap()}.
 

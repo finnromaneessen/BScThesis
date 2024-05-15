@@ -22,7 +22,6 @@ To create a more reliable performance analysis, all topologies will be evaluated
 This is done using \lstinline|std::chrono::steady_clock|, an implementation of a \emph{monotonic} clock, best suited for measuring time intervals \cite{monotonic_clock}.
 In lines 5-6, a \lstinline|std::chrono::duration| is created, representing the time elapsed between \emph{time\_start} and \emph{time\_end}, which is the execution time of the measured code region.
 
-%TODO QUOTE
 \begin{lstlisting}[language=c++, numbers=left, caption= Measuring the Execution Time, captionpos=b, label={lst:performance_code}]
     auto time_start = std::chrono::steady_clock::now();
     SharedMemory* shmem = export_component(path, topo, pack);
@@ -67,7 +66,7 @@ To test the performance of exporting and importing DataPaths, a small topology c
 These components are then connected by a large number of DataPaths without attribs or any additional data, so as not to skew the results.
 
 \begin{figure}[ht]
-    \includegraphics[scale=0.75]{images/dp_numbers.png} %TODO Improve graphic
+    \includegraphics[scale=0.75]{images/dp_numbers_old.png} %TODO Improve graphic
     \centering
     \caption{Performance DataPath Topology}
     \label{figure:dp_numbers}

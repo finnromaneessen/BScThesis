@@ -1,6 +1,3 @@
-%TODO How to quote? Everything from github concept.md?
-%TODO Part of Introduction?
-
 \chapter{Sys-Sage}\label{chapter:sys_sage}
 Sys-sage is a software library created to collect, represent and provide data on the hardware topology of HPC systems.
 It is designed to extend on the existing hwloc library and provide a more versatile and dynamic use-case.
@@ -13,7 +10,7 @@ such as measured bandwidth or memory usage.
 Sys-sage is designed specifically to enable users to create highly customized and dynamically changeable hardware topologies and build on top of existing hwloc topologies.
 
 \begin{figure}[ht]
-    \includegraphics[scale=0.3]{images/Topology_Example.png} %TODO Improve graphic
+    \includegraphics[scale=0.5]{images/Topology_Example.jpg}
     \centering
     \caption{Basic Component Tree with DataPaths}
     \label{figure:topology_example}
@@ -22,10 +19,10 @@ Sys-sage is designed specifically to enable users to create highly customized an
 The hierarchical structure of the hardware topology is represented in sys-sage as a tree of \emph{components}.
 Each component corresponds to a specific part of the hardware, such as a \emph{cache, core} or \emph{node}.
 Depending on the type of component, further information on the underlying hardware can be added to the component, for example the size of a cache.
-Additionally, arbitrary attributes can be attached to components to provide further context or add dynamically updated values to the topology.
+Additionally, arbitrary attributes can be attached to components to provide further context or add dynamically updated values to the topology. \cite{sys_concept}
 
 Beside the component tree, the \emph{DataPath} graph adds additional information to the topology.
 DataPaths are connect two arbitrary components and are used to represent non-hierarchical relationships between components.
-Much like components, DataPaths can have custom attributes to add additional data to component relationships.
+Much like components, DataPaths can have custom attributes to add additional data to component relationships. \cite{sys_concept}
 
 \autoref{figure:topology_example} shows a simple example of a topology consisting of two nodes including a few components and DataPaths.

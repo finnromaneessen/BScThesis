@@ -51,7 +51,7 @@ database management systems and data mining. \cite{crotty22-mmap} \cite{mmap_rel
 This section highlights different approaches to sharing large amounts of data between processes and nodes using memory mapped files as implemented by different libraries.
 
 \subsection*{hwloc}
-As mentioned above, portable hardware locality (hwloc) is the software library on which sys-sage bases its functionality and use cases.
+As outlined in \autoref{chapter:introduction}, portable hardware locality (hwloc) is the software library on which sys-sage bases its functionality and use cases.
 Much like sys-sage, hwloc is used to manage information about a systems hardware topology to improve the performance of HPC clusters.
 
 Hwloc offers users the option to share topologies between processes. To do this, the exporting process must use the \lstinline|hwloc_shmem_topology_write()| function,

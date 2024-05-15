@@ -1,5 +1,13 @@
 \chapter{\abstractname}
 
-%TODO: Abstract
+In this thesis, a file backed shared memory system was implemented, which can be used to share \emph{sys-sage} topologies between processes and nodes in HPC systems.
+The shared memory regions used to transfer the topologies between the processes are implemented with memory mapped files created using the \lstinline|mmap()| syscall.
 
+To share a \emph{sys-sage} topology, the exporting process recursively copies all components, including attribs and DataPaths, of the chosen topology into the created shared memory region.
+Since the virtual memory addresses inside the shared region, all pointers within the topology must be translated to offset based pointers.
 
+All importing processes can then recreate the topology in their local memory, translating the offset based pointers back into regular pointers and recreating the component tree structure.
+
+The performance of the implemented shared memory system is tested using multiple example topologies with different amounts of components, attribs and DataPaths.
+
+Additionally, some limitations of the presented implementation are discussed and suggestions for future improvements are made.

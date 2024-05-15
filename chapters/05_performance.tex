@@ -35,7 +35,7 @@ In lines 5-6, a \lstinline|std::chrono::duration| is created, representing the t
 For the first performance test, a simple component tree without any DataPaths or attribs is created. The component tree consists of an increasing number of components in a straight line of children, similar to a linked list.
 
 \begin{figure}[ht]
-    \includegraphics[scale=0.75]{images/component_numbers.png} %TODO Improve graphic, Input real numbers
+    \includegraphics[scale=0.25]{images/component_numbers.jpeg}
     \centering
     \caption{Performance Component Tree}
     \label{figure:component_numbers}
@@ -48,7 +48,7 @@ As complex sys-sage topologies can potentially have a lot of attribs that will o
 attribs is paramount to analyzing the performance of the entire system.
 
 \begin{figure}[ht]
-    \includegraphics[scale=0.75]{images/attrib_numbers.png} %TODO Improve graphic
+    \includegraphics[scale=0.26]{images/attrib_numbers.jpeg}
     \centering
     \caption{Performance Attrib Topology}
     \label{figure:attrib_numbers}
@@ -66,7 +66,7 @@ To test the performance of exporting and importing DataPaths, a small topology c
 These components are then connected by a large number of DataPaths without attribs or any additional data, so as not to skew the results.
 
 \begin{figure}[ht]
-    \includegraphics[scale=0.75]{images/dp_numbers_old.png} %TODO Improve graphic
+    \includegraphics[scale=0.29]{images/dp_numbers.jpg} 
     \centering
     \caption{Performance DataPath Topology}
     \label{figure:dp_numbers}
